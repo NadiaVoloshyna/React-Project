@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import Persons from '../components/Persons/Persons';
 import Cockpit from '../components/Cockpit/Cockpit';
+import AuthContext from '../context/auth-context';
 
 class App extends Component {
   constructor (props) {
@@ -15,7 +16,8 @@ class App extends Component {
 {id: 'ffd1', name: 'Steve', age: 34}
     ],
 showPersons: false,
-changeCounter: 0
+changeCounter: 0,
+authenticated: false
   }
 static getDerivedStateFromProps(props, state) {
 console.log('[App.js] getDerivedStateFromProps, props');
@@ -55,11 +57,14 @@ componentDidUpdate() {
     const persons = [...this.state.persons];
     persons.splice(personIndex, 1);
     this.setState({persons: persons})
-    }
+    };
     togglePersonsHandler = () => {
     const doesShow = this.state.showPersons;
     this.setState({showPersons: !doesShow});
-    }
+    };
+    loginHandler = () => {
+      this.setState({authenticated: true});
+    };
 
   render() {
     console.log('[App.js] render')
@@ -69,16 +74,23 @@ componentDidUpdate() {
     persons = <Persons 
     persons={this.state.persons}
     clicked={this.deletePersonHandler}
-    changed={this.nameChangedHandler} />;
+    changed={this.nameChangedHandler}
+    isAuthenticated={this.state.authenticated} />;
 }
 return (
   <div className="App">
+    <AuthContext.Provider 
+    value={{
+      authenticated: this.state.authenticated, 
+      login: this.loginHandler}}>
 <Cockpit
 title={this.props.appTitle}
 showPersons={this.state.showPersons}
 personsLength={this.state.persons.length}
-toggle={this.togglePersonsHandler} />
+toggle={this.togglePersonsHandler}
+ />
 {persons}
+</AuthContext.Provider>
   </div>
   );
 };
